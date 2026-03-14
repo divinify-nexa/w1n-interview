@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W1N Sales — First Round Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background-color: #050509; overflow-x: hidden; scroll-behavior: smooth; }
+
+/* ── BRAND TOKENS (exact match to W1N site) ─────── */
+:root {
+  --bg-dark:        #050509;
+  --bg-panel:       #0B0D10;
+  --primary:        #D4AF37;
+  --primary-hover:  #F2C94C;
+  --text-main:      #FFFFFF;
+  --text-muted:     #A0A0A0;
+  --glass-bg:       rgba(255,255,255,0.03);
+  --glass-border:   rgba(212,175,55,0.3);
+  --danger:         #e05252;
+  --radius:         12px;
+  --nav-height:     90px;
+  --ease:           cubic-bezier(0.23,1,0.32,1);
+  --max-width:      1200px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── NAV ────────────────────────────────────────── */
+.w1n-header {
+  position: sticky; top: 0; z-index: 999;
+  background: rgba(5,5,9,0.95);
+  border-bottom: 1px solid var(--glass-border);
+  height: var(--nav-height);
+  display: flex; align-items: center;
+  backdrop-filter: blur(12px);
+}
+
+.w1n-container {
+  width: 100%; max-width: var(--max-width);
+  margin: 0 auto; padding: 0 40px;
+}
+
+.nav-flex { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.logo-img { height: 70px; width: auto; display: block; }
+
+.nav-links {
+  display: flex; gap: 2rem; list-style: none;
+  align-items: center; flex: 1; justify-content: center;
+}
+.nav-links a {
+  text-decoration: none; color: var(--text-muted);
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--primary); }
+
+.header-socials { display: flex; gap: 1.2rem; align-items: center; }
+.social-link { display: flex; align-items: center; color: var(--text-muted); transition: color 0.3s, transform 0.3s; }
+.social-link:hover { color: var(--primary); transform: translateY(-2px); }
+.social-link svg { width: 18px; height: 18px; fill: currentColor; }
+
+.menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); }
+
+/* ── HERO ───────────────────────────────────────── */
+.page-hero {
+  position: relative;
+  padding: 80px 0 60px;
+  overflow: hidden;
+  background: radial-gradient(circle at top right, #1a1d24 0%, var(--bg-dark) 60%);
+}
+.page-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(212,175,55,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,175,55,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 40px;
+}
+
+.hero-text { max-width: 580px; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(212,175,55,0.1);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 4px; padding: 6px 14px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--primary); margin-bottom: 20px;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--primary); border-radius: 50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+.hero-text h1 {
+  font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 700;
+  text-transform: uppercase; line-height: 1;
+  margin-bottom: 16px; color: var(--text-main);
+}
+.hero-text h1 em { font-style: normal; color: var(--primary); display: block; }
+
+.hero-text p {
+  color: var(--text-muted); font-size: 1rem; line-height: 1.7;
+  border-left: 2px solid var(--primary); padding-left: 16px; margin: 0;
+}
+
+.hero-stat { text-align: right; flex-shrink: 0; }
+.stat-ring-wrap { position: relative; width: 120px; height: 120px; }
+.stat-ring-wrap svg { transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: rgba(212,175,55,0.15); stroke-width: 4; }
+.ring-fill {
+  fill: none; stroke: var(--primary); stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 339.3; stroke-dashoffset: 339.3;
+  transition: stroke-dashoffset 0.5s var(--ease);
+}
+.stat-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.stat-pct { font-size: 1.6rem; font-weight: 700; color: var(--primary); line-height: 1; }
+.stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+/* ── FORM AREA ──────────────────────────────────── */
+.form-area { flex: 1; padding: 60px 0 100px; background: var(--bg-dark); }
+.form-layout { max-width: 760px; margin: 0 auto; }
+
+/* Section labels */
+.form-section-label {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px; margin-top: 52px;
+}
+.form-section-label:first-of-type { margin-top: 0; }
+
+.section-num {
+  font-size: 10px; font-weight: 700;
+  color: #000; background: var(--primary);
+  border-radius: 2px; padding: 3px 7px;
+  letter-spacing: 0.08em; flex-shrink: 0;
+}
+.section-title {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--primary);
+}
+.section-line { flex: 1; height: 1px; background: var(--glass-border); }
+
+/* Cards */
+.field-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 28px; margin-bottom: 16px;
+  transition: border-color 0.25s, transform 0.25s;
+  animation: cardIn 0.4s var(--ease) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+.field-card:focus-within { border-color: rgba(212,175,55,0.6); transform: translateY(-1px); }
+.field-card.has-error { border-color: var(--danger) !important; transform: none; }
+
+.field-label {
+  display: block; font-size: 14px; font-weight: 500;
+  color: var(--text-main); line-height: 1.55; margin-bottom: 6px;
+}
+.field-label .req { color: var(--primary); margin-left: 3px; }
+
+.field-hint {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 14px; line-height: 1.5;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="url"],
+input[type="date"],
+textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 300;
+  padding: 12px 14px;
+  transition: border-color 0.2s, background 0.2s;
+  outline: none; -webkit-appearance: none;
+}
+input::placeholder, textarea::placeholder { color: rgba(160,160,160,0.5); }
+input:focus, textarea:focus {
+  border-color: var(--primary);
+  background: rgba(212,175,55,0.04);
+}
+textarea { resize: vertical; min-height: 96px; line-height: 1.65; }
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.65) sepia(1) saturate(2) hue-rotate(8deg); cursor: pointer;
+}
+
+/* Radio */
+.radio-group { display: flex; flex-direction: column; gap: 10px; }
+.radio-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; cursor: pointer;
+  font-size: 14px; color: var(--text-muted);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+.radio-option:hover { border-color: rgba(212,175,55,0.4); color: var(--text-main); }
+.radio-option input[type="radio"] { display: none; }
+.radio-dot {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(160,160,160,0.4); border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s;
+}
+.radio-dot::after {
+  content: ''; width: 8px; height: 8px;
+  background: var(--primary); border-radius: 50%;
+  transform: scale(0); transition: transform 0.15s var(--ease);
+}
+.radio-option input:checked ~ .radio-dot { border-color: var(--primary); }
+.radio-option input:checked ~ .radio-dot::after { transform: scale(1); }
+.radio-option:has(input:checked) {
+  border-color: rgba(212,175,55,0.45);
+  background: rgba(212,175,55,0.06);
+  color: var(--text-main);
+}
+
+/* Slider */
+.slider-display { font-size: 3rem; font-weight: 700; color: var(--primary); line-height: 1; margin-bottom: 12px; }
+.slider-display sup { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+input[type="range"] { width: 100%; -webkit-appearance: none; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-track { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px;
+  background: var(--primary); border-radius: 50%; margin-top: -9.5px;
+  box-shadow: 0 0 16px rgba(212,175,55,0.45); transition: transform 0.1s;
+}
+input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+.slider-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 8px; letter-spacing: 0.04em;
+}
+
+/* Video upload widget */
+.upload-zone {
+  border: 2px dashed rgba(212,175,55,0.3);
+  border-radius: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: rgba(212,175,55,0.03);
+  position: relative;
+}
+.upload-zone:hover {
+  border-color: rgba(212,175,55,0.65);
+  background: rgba(212,175,55,0.06);
+}
+.upload-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(212,175,55,0.09);
+}
+.upload-zone.uploaded {
+  border-color: rgba(212,175,55,0.7);
+  border-style: solid;
+  background: rgba(212,175,55,0.06);
+}
+.upload-icon {
+  width: 44px; height: 44px;
+  background: rgba(212,175,55,0.12);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.upload-title {
+  font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;
+}
+.upload-sub {
+  font-size: 12px; color: var(--text-muted); line-height: 1.5;
+}
+.upload-sub span { color: var(--primary); font-weight: 500; }
+.upload-input { display: none; }
+
+/* Progress bar */
+.upload-progress {
+  display: none;
+  margin-top: 16px;
+}
+.upload-progress.show { display: block; }
+.progress-bar-track {
+  height: 3px; background: rgba(255,255,255,0.08);
+  border-radius: 2px; overflow: hidden; margin-bottom: 6px;
+}
+.progress-bar-fill {
+  height: 100%; background: var(--primary);
+  border-radius: 2px; width: 0%;
+  transition: width 0.3s var(--ease);
+}
+.progress-label-text {
+  font-size: 11px; color: var(--text-muted);
+  display: flex; justify-content: space-between;
+}
+
+/* Uploaded state */
+.upload-success {
+  display: none;
+  align-items: center; gap: 12px;
+  background: rgba(212,175,55,0.07);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 8px; padding: 12px 14px;
+  margin-top: 12px;
+}
+.upload-success.show { display: flex; }
+.upload-success-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: rgba(212,175,55,0.15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.upload-success-info { flex: 1; min-width: 0; }
+.upload-success-name {
+  font-size: 13px; font-weight: 500; color: var(--text-main);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.upload-success-size { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.upload-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); padding: 4px;
+  transition: color 0.2s; flex-shrink: 0;
+}
+.upload-remove:hover { color: #e05252; }
+
+/* Hint note */
+.video-note {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 10px; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 6px;
+}
+.video-note svg { flex-shrink: 0; margin-top: 1px; }
+
+/* Errors */
+.err-msg {
+  display: none; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--danger); margin-top: 10px;
+}
+.field-card.has-error .err-msg { display: flex; }
+
+/* ── SUBMIT ─────────────────────────────────────── */
+.submit-zone {
+  margin-top: 52px; padding-top: 40px;
+  border-top: 1px solid var(--glass-border);
+}
+.submit-note {
+  font-size: 13px; color: var(--text-muted);
+  line-height: 1.7; margin-bottom: 24px; max-width: 560px;
+}
+.w1n-btn-submit {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%; background: var(--primary); color: #000; border: none;
+  border-radius: 4px; padding: 18px 32px;
+  font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  cursor: pointer; transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
+  position: relative; overflow: hidden;
+}
+.w1n-btn-submit::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 55%);
+  pointer-events: none;
+}
+.w1n-btn-submit:hover:not(:disabled) {
+  background: #fff; box-shadow: 0 8px 32px rgba(212,175,55,0.3); transform: translateY(-2px);
+}
+.w1n-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-icon { transition: transform 0.2s; }
+.w1n-btn-submit:hover .btn-icon { transform: translateX(4px); }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(0,0,0,0.25); border-top-color: #000;
+  border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.w1n-btn-submit.loading .btn-label,
+.w1n-btn-submit.loading .btn-icon { display: none; }
+.w1n-btn-submit.loading .spinner { display: block; }
+
+/* ── SUCCESS ────────────────────────────────────── */
+.success-wrap {
+  display: none; padding: 80px 0; text-align: center;
+  animation: cardIn 0.6s var(--ease) both;
+}
+.success-wrap.show { display: block; }
+.success-icon-ring {
+  width: 80px; height: 80px;
+  background: rgba(212,175,55,0.1); border: 2px solid var(--primary);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 28px;
+}
+.success-wrap h2 {
+  font-size: 3rem; font-weight: 700;
+  text-transform: uppercase; line-height: 1; margin-bottom: 16px;
+}
+.success-wrap h2 em { font-style: normal; color: var(--primary); display: block; }
+.success-wrap p {
+  color: var(--text-muted); font-size: 15px; line-height: 1.7;
+  max-width: 460px; margin: 0 auto 32px;
+}
+.success-wrap a {
+  display: inline-block; padding: 14px 32px;
+  background: transparent; border: 1px solid #fff; border-radius: 4px;
+  color: #fff; font-size: 0.85rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  text-decoration: none; transition: border-color 0.3s, color 0.3s;
+}
+.success-wrap a:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── FOOTER ─────────────────────────────────────── */
+.w1n-footer {
+  background: #000; border-top: 1px solid var(--glass-border);
+  padding: 4rem 0; margin-top: auto;
+}
+.footer-flex { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem; }
+.footer-col h4 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 1rem; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.footer-col a { text-decoration: none; color: var(--text-muted); transition: color 0.3s; }
+.footer-col a:hover { color: var(--primary); }
+.footer-bottom {
+  margin-top: 3rem; padding-top: 2rem;
+  border-top: 1px solid var(--glass-border);
+  text-align: center; font-size: 0.8rem; color: #555;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 900px) {
+  .w1n-container { padding: 0 20px; }
+  .nav-links, .header-socials { display: none; }
+  .menu-toggle { display: block; }
+  .nav-links.active {
+    display: flex; flex-direction: column;
+    position: absolute; top: var(--nav-height); left: 0;
+    width: 100%; background: #000; padding: 2rem;
+    z-index: 1000; border-bottom: 1px solid var(--glass-border);
+  }
+  .hero-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .hero-stat { align-self: flex-end; }
+  .field-card { padding: 20px; }
+}
+@media (max-width: 480px) {
+  .hero-text h1 { font-size: 2.5rem; }
+  .page-hero { padding: 50px 0 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="w1n-header">
+  <div class="w1n-container">
+    <div class="nav-flex">
+      <a href="https://www.w1nsalesinc.com/">
+        <img src="https://storage.googleapis.com/msgsndr/4jpoeUWIiAln5xCZ6vWy/media/6945a3a1173966d3ddb1c16a.png" alt="W1N Sales" class="logo-img">
+      </a>
+      <div class="menu-toggle" id="menuToggle">☰</div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="https://www.w1nsalesinc.com/">Home</a></li>
+        <li><a href="https://www.w1nsalesinc.com/about">About</a></li>
+        <li><a href="https://www.w1nsalesinc.com/services">Services</a></li>
+        <li><a href="https://www.w1nsalesinc.com/philanthropy">Philanthropy</a></li>
+        <li><a href="https://www.w1nsalesinc.com/team">Team</a></li>
+        <li><a href="https://www.w1nsalesinc.com/blog">Blog</a></li>
+        <li><a href="https://www.w1nsalesinc.com/contact">Contact</a></li>
+      </ul>
+      <div class="header-socials">
+        <a href="https://www.instagram.com/w1nsales/" target="_blank" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@w1nsales" target="_blank" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.49-3.35-3.98-5.6-1.11-5.09 2.06-10.25 7.21-11.22v4.18c-.8.04-1.62.24-2.35.61-2.36 1.19-3.08 4.23-1.6 6.31 1.04 1.58 2.97 2.45 4.83 2.19 1.42-.21 2.69-.96 3.52-2.13.75-1.02.99-2.28 1.05-3.53.05-4.22.01-8.43.01-12.65-.03.01-.06.01-.09.02z"/></svg>
+        </a>
+        <a href="https://www.facebook.com/p/W1N-Sales-61566817244912/" target="_blank" class="social-link">
+          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="w1n-container">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge">First Round Interview</div>
+        <h1>Show Us<em>Who You Are.</em></h1>
+        <p>Beyond the resume. W1N is built on real people — tell us what drives you, how you think, and why you belong here.</p>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-ring-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54"/>
+            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54"/>
+          </svg>
+          <div class="stat-inner">
+            <div class="stat-pct" id="statPct">0%</div>
+            <div class="stat-label">Complete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<main class="form-area">
+  <div class="w1n-container">
+    <div class="form-layout">
+
+      <form id="interviewForm" novalidate>
+
+        <!-- 01 ABOUT YOU -->
+        <div class="form-section-label">
+          <span class="section-num">01</span>
+          <span class="section-title">About You</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="name">
+          <label class="field-label" for="name">First and Last Name <span class="req">*</span></label>
+          <input type="text" id="name" name="01_Full_Name" placeholder="e.g. Jordan Smith" autocomplete="name" required>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <div class="field-card" data-field="about">
+          <label class="field-label" for="about">Here at W1N, one of our core values is "Belong" — we are family. Tell us a little about yourself beyond your resume. <span class="req">*</span></label>
+          <p class="field-hint">e.g. hobbies, sports, what you do for fun, favorite shows — anything that makes you <em>you</em>.</p>
+          <textarea id="about" name="02_About_Yourself" placeholder="Tell us about yourself..." rows="4" required></textarea>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <!-- 02 YOUR DRIVE -->
+        <div class="form-section-label">
+          <span class="section-num">02</span>
+          <span class="section-title">Your Drive</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="team_activity">
+          <label class="field-label" for="team_activity">If you've checked out our social media, you've noticed we love doing things outside the office together. If offered the position, what would excite you to do with the team? <span class="req">*</span></label>
+          <textarea id="team_activity" name="03_Team_Activity" placeholder="e.g. sports leagues, team dinners, competitions..." rows="3" required></textarea>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <div class="field-card" data-field="high_achiever">
+          <label class="field-label" for="high_achiever">We are a group of high achievers. Give us an example of a time you were a high achiever somewhere in your life. <span class="req">*</span></label>
+          <textarea id="high_achiever" name="04_High_Achiever_Example" placeholder="Be specific — context, actions, and outcomes matter." rows="4" required></textarea>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <div class="field-card" data-field="self_dev">
+          <label class="field-label" for="self_dev">We strongly encourage self-development. If offered a position with us, what's one thing you would want to work on about yourself? <span class="req">*</span></label>
+          <textarea id="self_dev" name="05_Self_Development" placeholder="Honesty here is a strength, not a weakness." rows="3" required></textarea>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <!-- 03 VIDEO RESPONSES -->
+        <div class="form-section-label">
+          <span class="section-num">03</span>
+          <span class="section-title">Video Responses</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="video1">
+          <label class="field-label">What attracted you to W1N? Why do you think you'd excel in a face-to-face sales role? <span class="req">*</span></label>
+          <!-- Hidden input holds the Uploadcare CDN URL after upload -->
+          <input type="hidden" id="video1" name="06_Video_Why_W1N">
+          <div class="upload-zone" id="zone1" onclick="document.getElementById('file1').click()">
+            <div class="upload-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4L6.5 7.5M10 4l3.5 3.5" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div class="upload-title">Upload your video response</div>
+            <div class="upload-sub">Drag & drop or <span>browse files</span> · MP4, MOV, WebM · Max 500MB</div>
+            <input class="upload-input" type="file" id="file1" accept="video/*" capture="user">
+            <div class="upload-progress" id="prog1">
+              <div class="progress-bar-track"><div class="progress-bar-fill" id="progFill1"></div></div>
+              <div class="progress-label-text"><span id="progStatus1">Uploading…</span><span id="progPct1">0%</span></div>
+            </div>
+          </div>
+          <div class="upload-success" id="success1">
+            <div class="upload-success-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 9l4 4 6-7" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="upload-success-info">
+              <div class="upload-success-name" id="fname1">video.mp4</div>
+              <div class="upload-success-size" id="fsize1"></div>
+            </div>
+            <button type="button" class="upload-remove" onclick="removeUpload('1')" title="Remove">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="video-note">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#A0A0A0"/><path d="M7 6v4M7 4.5v.5" stroke="#A0A0A0" stroke-linecap="round"/></svg>
+            Videos are uploaded securely via Uploadcare and linked to your application. Record 60–90 seconds.
+          </div>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Please upload your video response.</div>
+        </div>
+
+        <div class="field-card" data-field="video2">
+          <label class="field-label">Here at W1N we only bring on motivated individuals. What is your motivation? Why would you out-work every other candidate? <span class="req">*</span></label>
+          <input type="hidden" id="video2" name="07_Video_Motivation">
+          <div class="upload-zone" id="zone2" onclick="document.getElementById('file2').click()">
+            <div class="upload-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4L6.5 7.5M10 4l3.5 3.5" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div class="upload-title">Upload your video response</div>
+            <div class="upload-sub">Drag & drop or <span>browse files</span> · MP4, MOV, WebM · Max 500MB</div>
+            <input class="upload-input" type="file" id="file2" accept="video/*" capture="user">
+            <div class="upload-progress" id="prog2">
+              <div class="progress-bar-track"><div class="progress-bar-fill" id="progFill2"></div></div>
+              <div class="progress-label-text"><span id="progStatus2">Uploading…</span><span id="progPct2">0%</span></div>
+            </div>
+          </div>
+          <div class="upload-success" id="success2">
+            <div class="upload-success-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 9l4 4 6-7" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="upload-success-info">
+              <div class="upload-success-name" id="fname2">video.mp4</div>
+              <div class="upload-success-size" id="fsize2"></div>
+            </div>
+            <button type="button" class="upload-remove" onclick="removeUpload('2')" title="Remove">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="video-note">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#A0A0A0"/><path d="M7 6v4M7 4.5v.5" stroke="#A0A0A0" stroke-linecap="round"/></svg>
+            Videos are uploaded securely via Uploadcare and linked to your application. Record 60–90 seconds.
+          </div>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Please upload your video response.</div>
+        </div>
+
+        <!-- 04 VALUES -->
+        <div class="form-section-label">
+          <span class="section-num">04</span>
+          <span class="section-title">Values &amp; Priorities</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="ranking">
+          <label class="field-label" for="ranking">In a company, from most to least important, how would you rank: <strong style="color:var(--text-main)">Growth, Culture, Compensation</strong> — and why? <span class="req">*</span></label>
+          <textarea id="ranking" name="08_Values_Ranking" placeholder="1. [Attribute] — because...&#10;2. [Attribute] — because...&#10;3. [Attribute] — because..." rows="5" required></textarea>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Required.</div>
+        </div>
+
+        <!-- 05 SELF-ASSESSMENT -->
+        <div class="form-section-label">
+          <span class="section-num">05</span>
+          <span class="section-title">Self-Assessment</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="competitive">
+          <label class="field-label">On a scale of 1–10, how competitive are you? <span style="color:var(--text-muted);font-weight:400;">(Honesty is the best policy)</span> <span class="req">*</span></label>
+          <div class="slider-display" id="sliderDisplay">5 <sup>/ 10</sup></div>
+          <input type="range" id="competitive" name="09_Competitiveness" min="1" max="10" value="5">
+          <div class="slider-labels"><span>1 — Not competitive</span><span>10 — Extremely competitive</span></div>
+        </div>
+
+        <!-- 06 LOGISTICS -->
+        <div class="form-section-label">
+          <span class="section-num">06</span>
+          <span class="section-title">Logistics</span>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="field-card" data-field="transportation">
+          <label class="field-label">Do you have reliable transportation to and from work? <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="10_Transportation" value="Yes — personal car" required>
+              <div class="radio-dot"></div>Yes — personal car
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="10_Transportation" value="Yes — public transportation">
+              <div class="radio-dot"></div>Yes — public transportation
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="10_Transportation" value="No, not at this time">
+              <div class="radio-dot"></div>No, not at this time
+            </label>
+          </div>
+          <div class="err-msg" style="margin-top:12px;"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Please select an option.</div>
+        </div>
+
+        <div class="field-card" data-field="start_date">
+          <label class="field-label" for="start_date">If offered a position, when would be your next available start date? <span class="req">*</span></label>
+          <input type="date" id="start_date" name="11_Start_Date" required>
+          <div class="err-msg"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#e05252"/><path d="M7 4v3M7 9.5v.5" stroke="#e05252" stroke-linecap="round"/></svg> Please provide a date.</div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-zone">
+          <p class="submit-note">Your responses will be reviewed by the W1N leadership team. Qualified candidates will be contacted within 2–3 business days.</p>
+          <button type="submit" class="w1n-btn-submit" id="submitBtn">
+            <span class="btn-label">Submit Application</span>
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="spinner"></div>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- SUCCESS STATE -->
+      <div class="success-wrap" id="successWrap">
+        <div class="success-icon-ring">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M7 19l8 8L29 10" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2>Application<em>Received.</em></h2>
+        <p>Thank you for your time. The W1N team reviews every submission personally — we'll be in touch with qualified candidates within 2–3 business days.</p>
+        <a href="https://www.w1nsalesinc.com/">← Back to W1N Sales</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="w1n-footer">
+  <div class="w1n-container">
+    <div class="footer-flex">
+      <div class="footer-col" style="max-width:300px;">
+        <img src="https://storage.googleapis.com/msgsndr/4jpoeUWIiAln5xCZ6vWy/media/6945a3a1173966d3ddb1c16a.png" alt="W1N Sales" style="height:55px;margin-bottom:1rem;opacity:0.8;">
+        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6;margin:0;">Built around people, performance, and giving back. Based in Sandy Springs, GA.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li>1155 Perimeter Center W</li>
+          <li>Sandy Springs, GA 30338</li>
+          <li><a href="tel:4702278497">470-227-8497</a></li>
+          <li><a href="/cdn-cgi/l/email-protection#12517d7c667371665265237c61737e77617b7c713c717d7f"><span class="__cf_email__" data-cfemail="74371b1a001517003403451a07151811071d1a175a171b19">[email&#160;protected]</span></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://www.w1nsalesinc.com/about">About Us</a></li>
+          <li><a href="https://www.w1nsalesinc.com/services">Services</a></li>
+          <li><a href="https://www.w1nsalesinc.com/team">Careers</a></li>
+          <li><a href="https://www.w1nsalesinc.com/philanthropy">Giving Back</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2025 W1N SALES, Inc. All Rights Reserved.</div>
+  </div>
+</footer>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+//
+//  FORMSPREE (free)
+//  1. Sign up at https://formspree.io → New Form → copy 8-char ID → paste below
+//  2. In Formspree settings → Integrations → add notification email
+//
+//  UPLOADCARE (free tier — 3GB storage, 10GB traffic/month)
+//  1. Sign up at https://uploadcare.com → create a project
+//  2. Copy your Public API Key from Dashboard → paste below
+//  3. In Uploadcare dashboard: Settings → Restrict file types to video/* (optional)
+//
+//  ZAPIER (free tier — connects everything)
+//  Trigger:  Formspree › New Submission
+//  Action A: Google Sheets › Create Row  (master applicant log)
+//  Action B: Google Drive › Create Folder  named "{{01_Full_Name}} — {{12_Submitted_At}}"
+//  Action C: Google Drive › Upload File   using URL from 06_Video_Why_W1N field
+//  Action D: Google Drive › Upload File   using URL from 07_Video_Motivation field
+//  Optional: Gmail › Send Email to notify W1N team
+//
+const UPLOADCARE_KEY   = 'YOUR_UPLOADCARE_PUBKEY'; // ← replace after Uploadcare signup
+const UPLOADCARE_API   = 'https://upload.uploadcare.com/base/';
+const ENDPOINT         = 'https://n8n-production-f881.up.railway.app/webhook/w1n-interview';
+
+// ─── MOBILE NAV ──────────────────────────────────────────────────────────────
+document.getElementById('menuToggle').addEventListener('click', function () {
+  document.getElementById('navLinks').classList.toggle('active');
+});
+
+// ─── DRAG & DROP ─────────────────────────────────────────────────────────────
+['zone1','zone2'].forEach(zoneId => {
+  const zone = document.getElementById(zoneId);
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleUpload(zoneId.slice(-1), file);
+  });
+});
+
+// Trigger hidden file inputs
+document.getElementById('file1').addEventListener('change', e => {
+  if (e.target.files[0]) handleUpload('1', e.target.files[0]);
+});
+document.getElementById('file2').addEventListener('change', e => {
+  if (e.target.files[0]) handleUpload('2', e.target.files[0]);
+});
+
+// ─── UPLOAD HANDLER ──────────────────────────────────────────────────────────
+function formatBytes(bytes) {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+async function handleUpload(num, file) {
+  // Validate type
+  if (!file.type.startsWith('video/')) {
+    alert('Please select a video file (MP4, MOV, WebM, etc.)');
+    return;
+  }
+  // Validate size (500MB)
+  if (file.size > 500 * 1024 * 1024) {
+    alert('File is too large. Maximum size is 500MB.');
+    return;
+  }
+
+  const zone     = document.getElementById(`zone${num}`);
+  const prog     = document.getElementById(`prog${num}`);
+  const fill     = document.getElementById(`progFill${num}`);
+  const status   = document.getElementById(`progStatus${num}`);
+  const pctEl    = document.getElementById(`progPct${num}`);
+  const successEl = document.getElementById(`success${num}`);
+  const fnameEl  = document.getElementById(`fname${num}`);
+  const fsizeEl  = document.getElementById(`fsize${num}`);
+  const hiddenInput = document.getElementById(`video${num}`);
+
+  // Reset prior success
+  successEl.classList.remove('show');
+  hiddenInput.value = '';
+  zone.classList.remove('uploaded');
+
+  // Show progress
+  prog.classList.add('show');
+  fill.style.width = '0%';
+  pctEl.textContent = '0%';
+  status.textContent = 'Uploading…';
+
+  // Disable zone click during upload
+  zone.style.pointerEvents = 'none';
+
+  try {
+    let cdnUrl;
+
+    if (UPLOADCARE_KEY === 'YOUR_UPLOADCARE_PUBKEY') {
+      // ── DEMO MODE: simulate upload ──────────────────────────────────────
+      for (let p = 0; p <= 100; p += 10) {
+        await new Promise(r => setTimeout(r, 80));
+        fill.style.width = p + '%';
+        pctEl.textContent = p + '%';
+      }
+      cdnUrl = `https://ucarecdn.com/demo-${num}-${Date.now()}/`;
+    } else {
+      // ── REAL UPLOADCARE UPLOAD (XHR for progress tracking) ──────────────
+      const formData = new FormData();
+      formData.append('UPLOADCARE_PUB_KEY', UPLOADCARE_KEY);
+      formData.append('UPLOADCARE_STORE', '1'); // persist file
+      formData.append('file', file);
+
+      cdnUrl = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', UPLOADCARE_API);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            fill.style.width = pct + '%';
+            pctEl.textContent = pct + '%';
+            if (pct === 100) status.textContent = 'Processing…';
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            resolve(`https://ucarecdn.com/${data.file}/`);
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
+      });
+    }
+
+    // ── SUCCESS ─────────────────────────────────────────────────────────────
+    hiddenInput.value = cdnUrl;
+    fnameEl.textContent = file.name;
+    fsizeEl.textContent = formatBytes(file.size);
+    prog.classList.remove('show');
+    fill.style.width = '100%';
+    successEl.classList.add('show');
+    zone.classList.add('uploaded');
+    // Update zone text to show re-upload option
+    zone.querySelector('.upload-title').textContent = 'Video uploaded ✓';
+    zone.querySelector('.upload-sub').innerHTML = '<span>Click to replace</span>';
+    // Clear validation error
+    document.querySelector(`[data-field="video${num}"]`)?.classList.remove('has-error');
+    updateProgress();
+
+  } catch (err) {
+    prog.classList.remove('show');
+    status.textContent = 'Upload failed';
+    alert(`Upload failed: ${err.message}. Please try again.`);
+    console.error(err);
+  } finally {
+    zone.style.pointerEvents = 'auto';
+  }
+}
+
+// ─── REMOVE UPLOAD ───────────────────────────────────────────────────────────
+function removeUpload(num) {
+  document.getElementById(`video${num}`).value = '';
+  document.getElementById(`success${num}`).classList.remove('show');
+  document.getElementById(`zone${num}`).classList.remove('uploaded');
+  document.getElementById(`zone${num}`).querySelector('.upload-title').textContent = 'Upload your video response';
+  document.getElementById(`zone${num}`).querySelector('.upload-sub').innerHTML = 'Drag & drop or <span>browse files</span> · MP4, MOV, WebM · Max 500MB';
+  document.getElementById(`file${num}`).value = '';
+  updateProgress();
+}
+
+// ─── SLIDER ──────────────────────────────────────────────────────────────────
+const slider = document.getElementById('competitive');
+const sliderDisplay = document.getElementById('sliderDisplay');
+slider.addEventListener('input', () => {
+  sliderDisplay.innerHTML = `${slider.value} <sup>/ 10</sup>`;
+  updateProgress();
+});
+
+// ─── PROGRESS RING ───────────────────────────────────────────────────────────
+const FIELDS = ['name','about','team_activity','high_achiever','self_dev','video1','video2','ranking','transportation','start_date'];
+const CIRC = 2 * Math.PI * 54;
+
+function getVal(id) {
+  if (id === 'transportation') return document.querySelector('input[name="10_Transportation"]:checked') ? '1' : '';
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function updateProgress() {
+  const filled = FIELDS.filter(id => getVal(id) !== '').length;
+  const pct = Math.round((filled / FIELDS.length) * 100);
+  document.getElementById('statPct').textContent = pct + '%';
+  document.getElementById('ringFill').style.strokeDashoffset = CIRC - (pct / 100) * CIRC;
+}
+
+['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateProgress);
+});
+document.querySelectorAll('input[name="10_Transportation"]').forEach(r =>
+  r.addEventListener('change', updateProgress)
+);
+updateProgress();
+
+// ─── VALIDATION ──────────────────────────────────────────────────────────────
+function validate() {
+  let ok = true;
+  ['name','about','team_activity','high_achiever','self_dev','video1','video2','ranking','start_date'].forEach(id => {
+    const el = document.getElementById(id);
+    const card = document.querySelector(`[data-field="${id}"]`);
+    const empty = !el?.value.trim();
+    card?.classList.toggle('has-error', empty);
+    if (empty) ok = false;
+  });
+  const transOk = !!document.querySelector('input[name="10_Transportation"]:checked');
+  document.querySelector('[data-field="transportation"]')?.classList.toggle('has-error', !transOk);
+  if (!transOk) ok = false;
+  return ok;
+}
+
+document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(el => {
+  el.addEventListener('input', () => el.closest('.field-card')?.classList.remove('has-error'));
+});
+document.querySelectorAll('input[type="radio"]').forEach(r =>
+  r.addEventListener('change', () => r.closest('.field-card')?.classList.remove('has-error'))
+);
+
+// ─── FORM SUBMIT ─────────────────────────────────────────────────────────────
+document.getElementById('interviewForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!validate()) {
+    document.querySelector('.field-card.has-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  const payload = {
+    '01_Full_Name':             document.getElementById('name').value,
+    '02_About_Yourself':        document.getElementById('about').value,
+    '03_Team_Activity':         document.getElementById('team_activity').value,
+    '04_High_Achiever_Example': document.getElementById('high_achiever').value,
+    '05_Self_Development':      document.getElementById('self_dev').value,
+    '06_Video_Why_W1N':         document.getElementById('video1').value,
+    '07_Video_Motivation':      document.getElementById('video2').value,
+    '08_Values_Ranking':        document.getElementById('ranking').value,
+    '09_Competitiveness':       slider.value + ' / 10',
+    '10_Transportation':        document.querySelector('input[name="10_Transportation"]:checked')?.value,
+    '11_Start_Date':            document.getElementById('start_date').value,
+    '12_Submitted_At':          new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }) + ' ET',
+    '_subject':                 `W1N Interview — ${document.getElementById('name').value}`
+  };
+
+  try {
+    const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      // n8n responds 200 on success; non-ok statuses throw
+      if (!res.ok) throw new Error('Webhook rejected submission');
+
+    document.getElementById('interviewForm').style.display = 'none';
+    document.querySelector('.page-hero').style.display = 'none';
+    document.getElementById('successWrap').classList.add('show');
+    window.scrollTo({ top: 0,
