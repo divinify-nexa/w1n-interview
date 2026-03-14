@@ -978,15 +978,13 @@ function updateProgress() {
   if (ringEl) ringEl.style.strokeDashoffset = CIRC - (pct / 100) * CIRC;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  ['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', updateProgress);
-  });
-  document.querySelectorAll('input[name="10_Transportation"]').forEach(r =>
-    r.addEventListener('change', updateProgress)
-  );
-  updateProgress();
+['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateProgress);
 });
+document.querySelectorAll('input[name="10_Transportation"]').forEach(r =>
+  r.addEventListener('change', updateProgress)
+);
+updateProgress();
 
 // ─── VALIDATION ──────────────────────────────────────────────────────────────
 function validate() {
@@ -1004,18 +1002,14 @@ function validate() {
   return ok;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(el => {
-    el.addEventListener('input', () => el.closest('.field-card')?.classList.remove('has-error'));
-  });
-  document.querySelectorAll('input[type="radio"]').forEach(r =>
-    r.addEventListener('change', () => r.closest('.field-card')?.classList.remove('has-error'))
-  );
+document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(el => {
+  el.addEventListener('input', () => el.closest('.field-card')?.classList.remove('has-error'));
 });
+document.querySelectorAll('input[type="radio"]').forEach(r =>
+  r.addEventListener('change', () => r.closest('.field-card')?.classList.remove('has-error'))
+);
 
 // ─── FORM SUBMIT ─────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-
 document.getElementById('interviewForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!validate()) {
@@ -1065,7 +1059,7 @@ document.getElementById('interviewForm').addEventListener('submit', async (e) =>
   }
 });
 
-}); // end DOMContentLoaded
+
 </script>
 
 </body>
