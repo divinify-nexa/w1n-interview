@@ -972,17 +972,21 @@ function getVal(id) {
 function updateProgress() {
   const filled = FIELDS.filter(id => getVal(id) !== '').length;
   const pct = Math.round((filled / FIELDS.length) * 100);
-  document.getElementById('statPct').textContent = pct + '%';
-  document.getElementById('ringFill').style.strokeDashoffset = CIRC - (pct / 100) * CIRC;
+  const statEl = document.getElementById('statPct');
+  const ringEl = document.getElementById('ringFill');
+  if (statEl) statEl.textContent = pct + '%';
+  if (ringEl) ringEl.style.strokeDashoffset = CIRC - (pct / 100) * CIRC;
 }
 
-['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', updateProgress);
+document.addEventListener('DOMContentLoaded', function() {
+  ['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateProgress);
+  });
+  document.querySelectorAll('input[name="10_Transportation"]').forEach(r =>
+    r.addEventListener('change', updateProgress)
+  );
+  updateProgress();
 });
-document.querySelectorAll('input[name="10_Transportation"]').forEach(r =>
-  r.addEventListener('change', updateProgress)
-);
-updateProgress();
 
 // ─── VALIDATION ──────────────────────────────────────────────────────────────
 function validate() {
