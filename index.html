@@ -1004,14 +1004,18 @@ function validate() {
   return ok;
 }
 
-document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(el => {
-  el.addEventListener('input', () => el.closest('.field-card')?.classList.remove('has-error'));
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(el => {
+    el.addEventListener('input', () => el.closest('.field-card')?.classList.remove('has-error'));
+  });
+  document.querySelectorAll('input[type="radio"]').forEach(r =>
+    r.addEventListener('change', () => r.closest('.field-card')?.classList.remove('has-error'))
+  );
 });
-document.querySelectorAll('input[type="radio"]').forEach(r =>
-  r.addEventListener('change', () => r.closest('.field-card')?.classList.remove('has-error'))
-);
 
 // ─── FORM SUBMIT ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+
 document.getElementById('interviewForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!validate()) {
@@ -1051,4 +1055,18 @@ document.getElementById('interviewForm').addEventListener('submit', async (e) =>
     document.getElementById('interviewForm').style.display = 'none';
     document.querySelector('.page-hero').style.display = 'none';
     document.getElementById('successWrap').classList.add('show');
-    window.scrollTo({ top: 0,
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    alert('Something went wrong. Please try again or email Contact@w1nsalesinc.com');
+    console.error(err);
+  }
+});
+
+}); // end DOMContentLoaded
+</script>
+
+</body>
+</html>
