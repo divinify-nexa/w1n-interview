@@ -904,7 +904,7 @@ async function handleUpload(num, file) {
         xhr.onload = () => {
           if (xhr.status === 200) {
             const data = JSON.parse(xhr.responseText);
-            resolve(`https://ucarecdn.com/${data.file}/`);
+            resolve(`https://2ylpi2bex1.ucarecd.net/${data.file}/`);
           } else {
             reject(new Error(`Upload failed: ${xhr.status}`));
           }
