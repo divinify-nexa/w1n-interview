@@ -873,15 +873,6 @@ async function handleUpload(num, file) {
   try {
     let cdnUrl;
 
-    if (UPLOADCARE_KEY === '011e4f8a52ac55ecd155') {
-      // ── DEMO MODE: simulate upload ──────────────────────────────────────
-      for (let p = 0; p <= 100; p += 10) {
-        await new Promise(r => setTimeout(r, 80));
-        fill.style.width = p + '%';
-        pctEl.textContent = p + '%';
-      }
-      cdnUrl = `https://ucarecdn.com/demo-${num}-${Date.now()}/`;
-    } else {
       // ── REAL UPLOADCARE UPLOAD (XHR for progress tracking) ──────────────
       const formData = new FormData();
       formData.append('UPLOADCARE_PUB_KEY', UPLOADCARE_KEY);
@@ -913,7 +904,6 @@ async function handleUpload(num, file) {
         xhr.onerror = () => reject(new Error('Network error during upload'));
         xhr.send(formData);
       });
-    }
 
     // ── SUCCESS ─────────────────────────────────────────────────────────────
     hiddenInput.value = cdnUrl;
