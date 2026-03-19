@@ -692,7 +692,7 @@ const sliderDisplay = document.getElementById('sliderDisplay');
 slider.addEventListener('input', () => { sliderDisplay.innerHTML = `${slider.value} <sup>/ 10</sup>`; updateProgress(); });
 
 // PROGRESS RING
-const FIELDS = ['name','about','team_activity','high_achiever','self_dev','video1','video2','ranking','transportation','start_date'];
+const FIELDS = ['name','phone','email','about','team_activity','high_achiever','self_dev','video1','video2','ranking','transportation','start_date'];
 const CIRC = 2 * Math.PI * 54;
 function getVal(id) {
   if (id === 'transportation') return document.querySelector('input[name="10_Transportation"]:checked') ? '1' : '';
@@ -705,7 +705,7 @@ function updateProgress() {
   document.getElementById('statPct').textContent = pct + '%';
   document.getElementById('ringFill').style.strokeDashoffset = CIRC - (pct / 100) * CIRC;
 }
-['name','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
+['name','phone','email','about','team_activity','high_achiever','self_dev','ranking','start_date'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', updateProgress);
 });
 document.querySelectorAll('input[name="10_Transportation"]').forEach(r => r.addEventListener('change', updateProgress));
@@ -714,7 +714,7 @@ updateProgress();
 // VALIDATION
 function validate() {
   let ok = true;
-  ['name','about','team_activity','high_achiever','self_dev','video1','video2','ranking','start_date'].forEach(id => {
+ ['name','phone','email','about','team_activity','high_achiever','self_dev','video1','video2','ranking','start_date'].forEach(id => {
     const el = document.getElementById(id);
     const card = document.querySelector(`[data-field="${id}"]`);
     const empty = !el?.value.trim();
@@ -740,17 +740,19 @@ document.getElementById('interviewForm').addEventListener('submit', async (e) =>
   btn.classList.add('loading');
   const payload = {
     '01_Full_Name': document.getElementById('name').value,
-    '02_About_Yourself': document.getElementById('about').value,
-    '03_Team_Activity': document.getElementById('team_activity').value,
-    '04_High_Achiever_Example': document.getElementById('high_achiever').value,
-    '05_Self_Development': document.getElementById('self_dev').value,
-    '06_Video_Why_W1N': document.getElementById('video1').value,
-    '07_Video_Motivation': document.getElementById('video2').value,
-    '08_Values_Ranking': document.getElementById('ranking').value,
-    '09_Competitiveness': slider.value + ' / 10',
-    '10_Transportation': document.querySelector('input[name="10_Transportation"]:checked')?.value,
-    '11_Start_Date': document.getElementById('start_date').value,
-    '12_Submitted_At': new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }) + ' ET',
+    '02_Phone': document.getElementById('phone').value,
+    '03_Email': document.getElementById('email').value,
+    '04_About_Yourself': document.getElementById('about').value,
+    '05_Team_Activity': document.getElementById('team_activity').value,
+    '06_High_Achiever_Example': document.getElementById('high_achiever').value,
+    '07_Self_Development': document.getElementById('self_dev').value,
+    '08_Video_Why_W1N': document.getElementById('video1').value,
+    '09_Video_Motivation': document.getElementById('video2').value,
+    '10_Values_Ranking': document.getElementById('ranking').value,
+    '11_Competitiveness': slider.value + ' / 10',
+    '12_Transportation': document.querySelector('input[name="10_Transportation"]:checked')?.value,
+    '13_Start_Date': document.getElementById('start_date').value,
+    '14_Submitted_At': new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }) + ' ET',
     '_subject': `W1N Interview — ${document.getElementById('name').value}`
   };
   try {
