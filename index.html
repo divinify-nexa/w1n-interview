@@ -515,8 +515,7 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
 </footer>
 
 <script>
-const UPLOADCARE_KEY = '011e4f8a52ac55ecd155';
-const UPLOADCARE_API = 'https://upload.uploadcare.com/base/';
+const R2_PRESIGN_URL = 'https://n8n-production-f881.up.railway.app/webhook/r2-presign';
 const ENDPOINT = 'https://n8n-production-f881.up.railway.app/webhook/w1n-interview';
 
 // NAV
@@ -633,17 +632,24 @@ async function handleUpload(num, file) {
   prog.classList.add('show');
   fill.style.width = '0%';
   pctEl.textContent = '0%';
-  status.textContent = 'Uploading…';
+  status.textContent = 'Preparing upload…';
 
   try {
-    const formData = new FormData();
-    formData.append('UPLOADCARE_PUB_KEY', UPLOADCARE_KEY);
-    formData.append('UPLOADCARE_STORE', '1');
-    formData.append('file', file);
+    // 1. Get pre-signed URL from n8n
+    const fieldName = num === '1' ? 'videoWhy' : 'videoMot';
+    const presignRes = await fetch(R2_PRESIGN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fieldName, contentType: file.type || 'video/webm' })
+    });
+    if (!presignRes.ok) throw new Error('Could not get upload URL');
+    const { uploadUrl, publicUrl } = await presignRes.json();
 
+    // 2. Upload directly to R2 with progress
     const cdnUrl = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', UPLOADCARE_API);
+      xhr.open('PUT', uploadUrl);
+      xhr.setRequestHeader('Content-Type', file.type || 'video/webm');
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
           const pct = Math.round((e.loaded / e.total) * 100);
@@ -654,14 +660,13 @@ async function handleUpload(num, file) {
       };
       xhr.onload = () => {
         if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          resolve(`https://2ylpi2bex1.ucarecd.net/${data.file}/`);
+          resolve(publicUrl);
         } else {
           reject(new Error(`Upload failed: ${xhr.status}`));
         }
       };
       xhr.onerror = () => reject(new Error('Network error during upload'));
-      xhr.send(formData);
+      xhr.send(file);
     });
 
     hiddenInput.value = cdnUrl;
