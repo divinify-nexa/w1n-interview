@@ -541,7 +541,14 @@ const recorderState = {};
 
 async function startRecording(num) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    // Constrain to 720p so recorded files are upload-friendly (~4x smaller).
+    // Applicants record as long as they want — only file SIZE is reduced.
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, audio: true });
+    } catch (constraintErr) {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    }
     recorderState[num] = { stream, chunks: [], timer: null, seconds: 0 };
     document.getElementById('videoOptions' + num).style.display = 'none';
     const ui = document.getElementById('recorderUI' + num);
@@ -555,11 +562,34 @@ async function startRecording(num) {
 
 function beginRecording(num) {
   const state = recorderState[num];
-  const mediaRecorder = new MediaRecorder(state.stream, { mimeType: getSupportedMimeType() });
+  let mediaRecorder;
+  const preferred = getSupportedMimeType();
+  // Bitrate cap keeps a 60-90s clip near ~20MB instead of ~80MB.
+  const opts = { videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 };
+  if (preferred) opts.mimeType = preferred;
+  try {
+    mediaRecorder = new MediaRecorder(state.stream, opts);
+  } catch (err) {
+    // Some iOS Safari versions reject the options object — fall back gracefully.
+    try {
+      mediaRecorder = preferred ? new MediaRecorder(state.stream, { mimeType: preferred }) : new MediaRecorder(state.stream);
+    } catch (err2) {
+      try {
+        mediaRecorder = new MediaRecorder(state.stream);
+      } catch (err3) {
+        cancelRecording(num);
+        alert('In-browser recording is not supported on this device. Please use the Upload File option instead.');
+        return;
+      }
+    }
+  }
   state.mediaRecorder = mediaRecorder;
+  // Store the mimeType the recorder actually used so the file matches it.
+  state.mimeType = mediaRecorder.mimeType || preferred || 'video/webm';
   state.chunks = [];
-  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) state.chunks.push(e.data); };
-  mediaRecorder.start(100);
+  mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) state.chunks.push(e.data); };
+  // No timeslice — iOS Safari emits broken/empty fragments when one is set.
+  mediaRecorder.start();
   document.getElementById('recStart' + num).style.display = 'none';
   document.getElementById('recStop' + num).style.display = 'flex';
   const timerEl = document.getElementById('recTimer' + num);
@@ -577,8 +607,18 @@ function stopRecording(num) {
   const state = recorderState[num];
   clearInterval(state.timer);
   state.mediaRecorder.onstop = () => {
-    const mimeType = getSupportedMimeType();
+    const mimeType = state.mimeType || getSupportedMimeType();
     const blob = new Blob(state.chunks, { type: mimeType });
+    // Guard against empty/corrupt captures (the iOS fragmentation failure mode).
+    // A real 60-90s clip is several MB; under ~50KB means it didn't record —
+    // re-prompt instead of silently shipping a dead file.
+    if (blob.size < 51200) {
+      document.getElementById('recStart' + num).style.display = 'flex';
+      document.getElementById('recStop' + num).style.display = 'none';
+      document.getElementById('recTimer' + num).style.display = 'none';
+      alert("That recording didn't capture correctly. Please tap Start Recording to try again, or use the Upload File option.");
+      return;
+    }
     const ext = mimeType.includes('webm') ? 'webm' : mimeType.includes('mp4') ? 'mp4' : 'mov';
     const file = new File([blob], `recording-${num}.${ext}`, { type: mimeType });
     document.getElementById('recorderUI' + num).style.display = 'none';
@@ -643,41 +683,61 @@ async function handleUpload(num, file) {
   pctEl.textContent = '0%';
   status.textContent = 'Preparing upload…';
 
-  try {
-    // 1. Get pre-signed URL from n8n
-    const fieldName = num === '1' ? 'videoWhy' : 'videoMot';
-    const presignRes = await fetch(R2_PRESIGN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fieldName, contentType: file.type || 'video/webm' })
-    });
-    if (!presignRes.ok) throw new Error('Could not get upload URL');
-    const { uploadUrl, publicUrl } = await presignRes.json();
+  const fieldName = num === '1' ? 'videoWhy' : 'videoMot';
+  const MAX_ATTEMPTS = 3;
+  let presign = null, lastErr = null, cdnUrl = null;
 
-    // 2. Upload directly to R2 with progress
-    const cdnUrl = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('PUT', uploadUrl);
-      xhr.setRequestHeader('Content-Type', file.type || 'video/webm');
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const pct = Math.round((e.loaded / e.total) * 100);
-          fill.style.width = pct + '%';
-          pctEl.textContent = pct + '%';
-          if (pct === 100) status.textContent = 'Processing…';
-        }
-      };
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          resolve(publicUrl);
-        } else {
-          reject(new Error(`Upload failed: ${xhr.status}`));
-        }
-      };
-      xhr.onerror = () => reject(new Error('Network error during upload'));
-      xhr.send(file);
-    });
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      // 1. Get a pre-signed URL (re-fetched only if the presign itself failed).
+      if (!presign) {
+        const presignRes = await fetch(R2_PRESIGN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fieldName, contentType: file.type || 'video/webm' })
+        });
+        if (!presignRes.ok) throw new Error('presign_' + presignRes.status);
+        presign = await presignRes.json();
+        if (!presign || !presign.uploadUrl) throw new Error('presign_no_url');
+      }
 
+      // 2. PUT directly to R2 with progress + timeout.
+      status.textContent = attempt > 1 ? ('Retrying… (' + attempt + ')') : 'Uploading…';
+      cdnUrl = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', presign.uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'video/webm');
+        xhr.timeout = 180000;
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            fill.style.width = pct + '%';
+            pctEl.textContent = pct + '%';
+            if (pct === 100) status.textContent = 'Processing…';
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 204) resolve(presign.publicUrl);
+          else reject(new Error('put_' + xhr.status));
+        };
+        xhr.onerror = () => reject(new Error('network_error'));
+        xhr.ontimeout = () => reject(new Error('timeout'));
+        xhr.send(file);
+      });
+      break; // success — exit retry loop
+    } catch (err) {
+      lastErr = err;
+      // If the presign failed, force a fresh one on the next attempt.
+      if (String(err.message || '').indexOf('presign') === 0) presign = null;
+      if (attempt < MAX_ATTEMPTS) {
+        await new Promise(r => setTimeout(r, attempt * 1200));
+        fill.style.width = '0%';
+        pctEl.textContent = '0%';
+      }
+    }
+  }
+
+  if (cdnUrl) {
     hiddenInput.value = cdnUrl;
     fnameEl.textContent = file.name;
     fsizeEl.textContent = formatBytes(file.size);
@@ -686,9 +746,10 @@ async function handleUpload(num, file) {
     document.getElementById('videoOptions' + num).style.display = 'none';
     document.querySelector(`[data-field="video${num}"]`)?.classList.remove('has-error');
     updateProgress();
-  } catch (err) {
+  } else {
     prog.classList.remove('show');
-    alert(`Upload failed: ${err.message}. Please try again.`);
+    document.getElementById('videoOptions' + num).style.display = 'flex';
+    alert('Upload failed after a few tries (' + (lastErr ? lastErr.message : 'unknown') + '). Please check your connection and try again, or switch networks (Wi-Fi vs. cellular).');
   }
 }
 
