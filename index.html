@@ -523,6 +523,14 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
   </div>
 </footer>
 
+<!-- Zerva intake beacon (additive telemetry — does not touch the n8n/Sheet flow).
+     NOTE: endpoint currently points at the DEV PREVIEW for testing.
+     At launch (after dev→main merge), swap both URLs to the production domain. -->
+<script src="https://zerva-core-git-dev-divinify-nexas-projects.vercel.app/intake.js"
+  data-token="e4b1e4cbebc7276baa8b3f51f08d487c6ab937a55610d1d7"
+  data-page="first-round-interview"
+  data-endpoint="https://zerva-core-git-dev-divinify-nexas-projects.vercel.app/api/intake/sessions"></script>
+
 <script>
 const R2_PRESIGN_URL = 'https://n8n-production-f881.up.railway.app/webhook/r2-presign';
 const ENDPOINT = 'https://n8n-production-f881.up.railway.app/webhook/w1n-interview';
@@ -739,6 +747,7 @@ async function handleUpload(num, file) {
 
   if (cdnUrl) {
     hiddenInput.value = cdnUrl;
+    try { window.__zervaIntake && window.__zervaIntake.patchFormData({ ['video' + num + '_url']: cdnUrl }); } catch (_) {}
     fnameEl.textContent = file.name;
     fsizeEl.textContent = formatBytes(file.size);
     prog.classList.remove('show');
@@ -833,6 +842,7 @@ document.getElementById('interviewForm').addEventListener('submit', async (e) =>
   try {
     const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) });
     if (!res.ok) throw new Error('Webhook rejected submission');
+    try { window.__zervaIntake && window.__zervaIntake.markSubmitted(); } catch (_) {}
     document.getElementById('interviewForm').style.display = 'none';
     document.querySelector('.page-hero').style.display = 'none';
     document.getElementById('successWrap').classList.add('show');
