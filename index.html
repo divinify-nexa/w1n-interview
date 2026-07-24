@@ -837,8 +837,9 @@ document.getElementById('interviewForm').addEventListener('submit', async (e) =>
     '11_Competitiveness': slider.value + ' / 10',
     '12_Transportation': document.querySelector('input[name="10_Transportation"]:checked')?.value,
     '13_Start_Date': document.getElementById('start_date').value,
-    '14_Submitted_At': new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }) + ' ET',
-    '_subject': `W1N Interview — ${document.getElementById('name').value}`
+   '14_Submitted_At': new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }) + ' ET',
+    '_subject': `W1N Interview — ${document.getElementById('name').value}`,
+    'sessionId': (window.__zervaIntake && window.__zervaIntake.sessionId) || null
   };
   try {
     const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) });
